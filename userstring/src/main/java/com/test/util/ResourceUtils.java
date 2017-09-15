@@ -14,7 +14,9 @@ public class ResourceUtils {
 			String[] arrNumbers = text.replaceAll("\\D+", " ").trim().split(" ");
 			int sum = 0;
 			for (String strNumber : arrNumbers) {
-				sum += Integer.parseInt(strNumber);
+				if(strNumber.length() > 0) {
+					sum += Integer.parseInt(strNumber);
+				}
 			}
 			
 			return sum;
@@ -42,13 +44,4 @@ public class ResourceUtils {
 		}
 		return true;
 	}
-
-	public static void main(String argt[]) {
-		//  12 34 56 78 90 
-//		System.out.println("asdf.12_-==`!@34$#56^%78*&90)(".replaceAll("\\D+", " "));
-//		System.out.println(removeLastOccuranceOfChar("asdfbbfdlknnkb fdjlkasdff", 'f'));		
-//		System.out.println(isValidJSon(""));		
-		
-	}
-
 }
