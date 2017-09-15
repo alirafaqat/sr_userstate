@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.test.entity.ResourceEntity;
+import com.test.session.TokenHelper;
 import com.test.util.ResourceUtils;
 
 @RestController
@@ -25,19 +26,19 @@ public class ResourceController {
 
 	@Autowired
 	ResourceUtils resourceUtils;
+	
+	@Autowired
+	TokenHelper tokenHelper;
 
 	private static final Logger logger = LoggerFactory.getLogger(ResourceController.class);
-
-	public ResourceController() {
-		logger.info("* ***** *** *** *** ** Controller created");
-	}
 
 	@RequestMapping(value = "/chars", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<String>  postState(@RequestParam(value = "character") String chars,
 			@RequestParam(value = "amount") Integer amount, HttpServletRequest request, HttpServletResponse response) {
 		ResourceEntity resourceEntity = getUserState(request);
-		if(!validateSingleAlphaNumeric(chars) || resourceEntity.getData().length() + amount > 200) {
+		String username = tokenHelper.getUserName(request, response);
+		if(!validateSingleAlphaNumeric(chars) || resourceEntity.getData().length() + amount > 200 || amount > 9) {
 			return new ResponseEntity("BAD_REQUEST", HttpStatus.BAD_REQUEST);
 		}
 		resourceEntity.appendData(chars.charAt(0), amount);
@@ -48,7 +49,8 @@ public class ResourceController {
 	}
 
 	@RequestMapping("/state")
-	public String getState(HttpServletRequest request) {
+	public String getState(HttpServletRequest request, HttpServletResponse response) {
+		
 		ResourceEntity resourceEntity = getUserState(request);
 		logger.info("userID: \"" + getUserId(request) + ", viewed current statte");
 		return resourceEntity.getData();
@@ -82,11 +84,6 @@ public class ResourceController {
 		return new ResponseEntity(resourceEntity.getData(), HttpStatus.OK);
 	}
 
-//	@RequestMapping("/error")
-//    public String error(HttpServletResponse response) {
-//        return "" + HttpServletResponse.SC_NOT_FOUND;
-//    }
-//
 	private String getUserId(HttpServletRequest request) {
 		return request.getSession().getId();
 	}
